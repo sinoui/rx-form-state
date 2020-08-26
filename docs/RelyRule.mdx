@@ -1,0 +1,72 @@
+---
+name: RelyRule
+route: /api-rely-rule-component
+---
+
+import { Props } from 'docz';
+import RelyRule from '../src/RelyRule';
+
+# RelyRule
+
+添加值关联计算规则的组件。
+
+```ts
+import { RelyRule } from '@sinoui/rx-form-state';
+```
+
+## 基本用法
+
+```tsx
+<RelyRule
+  relyFields={['B', 'C']}
+  relyFn={(draft) => {
+    draft.A = draft.B + draft.C + 3;
+  }}
+/>
+```
+
+注意，此组件只能在表单上下文中使用。如：
+
+```tsx
+<Form state={formState}>
+  <RelyRule
+    relyFields={['B', 'C']}
+    relyFn={(draft) => {
+      draft.A = draft.B + draft.C + 3;
+    }}
+  />
+</Form>
+```
+
+或者：
+
+```tsx
+<FormStateContext.Provider value={formState}>
+  <RelyRule
+    relyFields={['B', 'C']}
+    relyFn={(draft) => {
+      draft.A = draft.B + draft.C + 3;
+    }}
+  />
+</FormStateContext.Provider>
+```
+
+## 本质
+
+此组件只是简单封装了一下 `formState.addRelyRule` 方法，相当于：
+
+```tsx
+function FormDemo() {
+  const formState = useFormState();
+
+  useEffect(() => {
+    return formState.addRelyRule(['B', 'C'], (draft) => {
+      draft.A = draft.B + draft.C;
+    });
+  }, [formState]);
+}
+```
+
+## 属性
+
+<Props of={RelyRule} />
