@@ -1,7 +1,16 @@
 {
   "name": "@sinoui/rx-form-state",
-  "version": "0.1.0",
+  "description": "表单状态管理库",
+  "version": "1.0.0-beta.23",
   "license": "MIT",
+  "homepage": "https://sinoui.github.io/rx-form-state",
+  "bugs": {
+    "url": "https://github.com/sinoui/rx-form-state/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sinoui/rx-form-state.git"
+  },
   "main": "dist/index.js",
   "umd:main": "dist/rx-form-state.umd.production.js",
   "module": "dist/rx-form-state.esm.js",

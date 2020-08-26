@@ -1,6 +1,14 @@
 # rx-form-state
 
-这是由[ts-lib-scripts](https://github.com/sinoui/ts-lib-scripts)创建的TypeScript库项目。
+[![npm version](https://img.shields.io/npm/v/@sinoui/rx-form-state)](https://www.npmjs.com/package/@sinoui/rx-form-state) [![downloads](https://img.shields.io/npm/dm/@sinoui/rx-form-state)](https://www.npmjs.com/package/@sinoui/rx-form-state)
+
+表单状态管理库。[文档](https://sinoui.github.io/rx-form-state/)。
+
+## 安装
+
+```shell
+yarn add @sinoui/rx-form-state
+```
 
 ## 本地开发
 
@@ -39,20 +47,10 @@ yarn doc:dev
 ### 编译并打包文档
 
 ```shell
-yarn doc:publish
+yarn doc:build
 ```
 
 ### 发布文档
-
-在发布文档之前，在`package.json`中配置好`homepage`，如下所示：
-
-```json
-{
-  "homepage": "https://sinouiincubator.github.io/editable-data-table"
-}
-```
-
-配置完之后就可以执行下面的命令行发布文档：
 
 ```shell
 yarn doc:publish
