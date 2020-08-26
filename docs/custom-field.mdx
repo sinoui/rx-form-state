@@ -1,0 +1,438 @@
+---
+name: 自定义表单域
+route: /custom-field
+menu: 教程
+---
+
+import { Playground } from 'docz';
+import {
+  useFormState,
+  FormValueMonitor,
+  useField,
+  useFieldValue,
+  FormStateContext,
+  Field,
+} from '../src';
+import CustomFormFieldDemo from './src/CustomFieldDemo';
+import CustomCheckboxGroupDemo from './src/CustomCheckboxGroupDemo';
+
+# 自定义表单域
+
+使用[@sinoui/rx-form-state](rx-form-state)做表单状态管理时，我们可以通过以下三种方式自定义表单域：
+
+- 使用`Field`组件的`as`属性
+- 使用`Field`组件的`render`属性
+- 使用`useField`的 hook
+
+## 使用 Field 的 as 属性自定义表单域
+
+1. `as`属性可以接收多种类型的组件，如`select`、`TextInput`、`Datepicker`等
+2. `Field`组件可以接收`as`对应组件的属性，并传递给 as 属性对应的组件，比如`readOnly`、`disabled`等
+
+基本用法:
+
+`Select.tsx`
+
+```tsx
+import React from 'react';
+import { Field } from '@sinoui/rx-form-state';
+
+export default function Select(props) {
+  return <Field as="select" {...props} />;
+}
+```
+
+`FormDemo.tsx`
+
+```tsx
+import React from 'react';
+import {
+  useFormState,
+  FormStateContext
+  Field,
+} from '@sinoui/rx-form-state';
+
+function FormDemo() {
+  const formState = useFormState({ city: '北京' });
+
+  return (
+    <FormStateContext.Provider value={formState}>
+    <form>
+      <div>
+        <label>用户名</label>
+        <Field name="userName" as="input" required />
+      </div>
+      <div>
+        <label>所在城市</label>
+        <Select name="city" required style={{ width: 160 }}>
+          <option value="北京">北京</option>
+          <option value="上海">上海</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
+        </Select>
+      </div>
+      </form>
+    </FormStateContext.Provider>
+  );
+}
+```
+
+运行效果：
+
+<Playground>
+{()=>{
+    const formState = useFormState({ city: '北京' });
+    return (
+      <FormStateContext.Provider value={formState}>
+    <form>
+      <div>
+        <label>用户名</label>
+        <Field name="userName" as="input" required />
+      </div>
+      <div>
+        <label>所在城市</label>
+        <Field name="city" as="select" required style={{ width: 160 }}>
+            <option value="北京">北京</option>
+            <option value="上海">上海</option>
+            <option value="广州">广州</option>
+            <option value="深圳">深圳</option>
+            </Field>
+      </div>
+      </form>
+    </FormStateContext.Provider>
+    );
+}}
+
+
+</Playground>
+
+
+使用`as`属性有局限性。它不适用于以下三个场景：
+
+- 一次性设置多个表单域的值
+- 自定义的表单域值依赖于多个表单域的值
+- 表单域值需要做二次处理才能指定给表单域控件
+
+这些场景可以通过`Field`的`render`属性自定义表单域实现。
+
+## 使用 Field 的 render 属性自定义表单域
+
+我们使用`Field`组件的`render`属性自定义一个可以同时设置多个表单域值的表单域，`render`方法中有一个`formState`对象，当表单域值发生变化时，依次调用`formState.setFieldValue()`方法可以设置多个表单域的值。
+
+基本用法：
+
+```tsx
+import React from 'react';
+import {
+  Field,
+  useFormState,
+  FormValueMonitor,
+  FormStateContext,
+} from '@sinoui/rx-form-state';
+
+function FormDemo() {
+  const formState = useFormState({});
+
+  return (
+    <FormStateContext.Provider value={formState}>
+      <form>
+        <div>
+          <label>公文标题</label>
+          <Field as="input" name="title" />
+        </div>
+        <div>
+          <label>紧急程度</label>
+          <Field
+            name="jjcdNum"
+            render={({ formState, fieldProps }) => {
+              return (
+                <select
+                  {...fieldProps}
+                  style={{ width: 160 }}
+                  onChange={(event) => {
+                    formState.setFieldValue('jjcdNum', event.target.value);
+                    formState.setFieldValue(
+                      'jjcd',
+                      event.target.selectedOptions[0].label,
+                    );
+                  }}
+                >
+                  <option value="001">急</option>
+                  <option value="002">特急</option>
+                  <option value="003">限时</option>
+                  <option value="004">特提</option>
+                </select>
+              );
+            }}
+          />
+        </div>
+        <FormValueMonitor>
+          {(values) => (
+            <div>表单值：{JSON.stringify(values, undefined, 2)}</div>
+          )}
+        </FormValueMonitor>
+      </form>
+    </FormStateContext.Provider>
+  );
+}
+```
+
+运行效果：
+
+<Playground>
+  {() => {
+    const formState = useFormState({ jjcdNum: '002' });
+    return (
+      <FormStateContext.Provider value={formState}>
+        <form>
+          <div>
+            <label>公文标题</label>
+            <Field as="input" name="title" />
+          </div>
+          <div>
+            <label>紧急程度</label>
+            <Field
+              name="jjcdNum"
+              render={({ formState, fieldProps }) => {
+                return (
+                  <select
+                    {...fieldProps}
+                    style={{ width: 160 }}
+                    onChange={(event) => {
+                      formState.setFieldValue('jjcdNum', event.target.value);
+                      formState.setFieldValue(
+                        'jjcd',
+                        event.target.selectedOptions[0].label,
+                      );
+                    }}
+                  >
+                    <option value="001">急</option>
+                    <option value="002">特急</option>
+                    <option value="003">限时</option>
+                    <option value="004">特提</option>
+                  </select>
+                );
+              }}
+            />
+          </div>
+          <FormValueMonitor>
+            {(values) => (
+              <div>表单值：{JSON.stringify(values, undefined, 2)}</div>
+            )}
+          </FormValueMonitor>
+        </form>
+      </FormStateContext.Provider>
+    );
+  }}
+</Playground>
+
+## 值提取
+
+Field 组件内置了从表单域组件值变化事件（ `event` ）中提取表单域值的默认规则：
+
+- 如果 `event` 是事件类型，则表单域值为 `event.target.value`；
+- 否则认为 `event` 是表单域的值。
+
+内置的默认值提取规则满足大部分需求，但是如果有定制需求的话，则可以使用 `valueExtract` 属性自定义值提取规则。如下多选复选框组组件：
+
+`TimeInput.tsx`
+
+```tsx
+import React from 'react';
+
+export default function TimeInput({
+  value = '00:00',
+  onChange,
+}: {
+  onChange: (hour: string, minute: string) => void;
+  value?: string;
+}) {
+  const [hour, minute] = value.split(':');
+
+  return (
+    <div>
+      <label>
+        <input
+          value={hour}
+          onChange={(event) => {
+            onChange(event.target.value, minute);
+          }}
+        />
+        h
+      </label>
+      <label>
+        <input
+          value={minute}
+          onChange={(event) => {
+            onChange(hour, event.target.value);
+          }}
+        />
+        m
+      </label>
+    </div>
+  );
+}
+```
+
+`TimeInputField.tsx`
+
+```tsx
+import React from 'react';
+import TimeInput from './TimeInput';
+
+export default function TimeInputField(props) {
+  return (
+    <Field
+      {...props}
+      as={TimeInput}
+      valueExtract={(hour, minute) => `${hour}:${minute}`}
+    />
+  );
+}
+```
+
+`CustomFormFieldDemo.tsx`
+
+```tsx
+import React from 'react';
+import { useFormState, FormStateContext, Field } from '@sinoui/rx-form-state';
+import TimeInputField from './TimeInputField';
+
+function CustomFormFieldDemo() {
+  const formState = useFormState();
+
+  return (
+    <FormStateContext.Provider value={formState}>
+      <form>
+        <div>
+          <label>开始时间</label>
+          <TimeInputField name="startTime" />
+        </div>
+        <div>
+          <label>结束时间</label>
+          <TimeInputField name="endTime" />
+        </div>
+        <FormValueMonitor>
+          {(values) => <div>表单值：{JSON.stringify(values)}</div>}
+        </FormValueMonitor>
+      </form>
+    </FormStateContext.Provider>
+  );
+}
+```
+
+运行效果：
+
+<Playground>
+  <CustomFormFieldDemo />
+</Playground>
+
+## 值格式化
+
+如果 `Field` 从 `formState` 中提取的表单域值类型与表单域 `as` 组件的值类型不匹配，则可以通过 `valueFormat` 属性指定值格式化器，将表单中的值转换成 `as` 组件可以使用的值。如，复选框组组件，我们期望在表单状态中存储的值是字符串类型的，如：`'篮球,足球'`，但是复选框组组件只接收数组类型的值。
+
+`CheckboxGroup.tsx`:
+
+```tsx
+import React from 'react';
+export interface Props {
+  items: { value: string; label: string }[];
+  value?: string[];
+  onChange: (value: string[]) => void;
+}
+
+function CheckboxGroup(props: Props) {
+  const { items, value = [], onChange } = props;
+
+  const handleCheckboxChange = (checkboxValue: string) => {
+    const idx = value.indexOf(checkboxValue);
+    if (!onChange) {
+      return;
+    }
+    if (idx === -1) {
+      onChange([...value, checkboxValue]);
+    } else {
+      onChange([...value.slice(0, idx), ...value.slice(idx + 1)]);
+    }
+  };
+
+  return (
+    <div>
+      {items.map((item) => (
+        <label>
+          <input
+            type="checkbox"
+            checked={value && value.includes(item.value)}
+            onChange={() => handleCheckboxChange(item.value)}
+          />
+          {item.label}
+        </label>
+      ))}
+    </div>
+  );
+}
+```
+
+`CheckboxGroupField.tsx`:
+
+```tsx
+function valueExtract(value: string[]) {
+  return value.join(',');
+}
+
+function valueFormat(value: string) {
+  return value.split(',');
+}
+
+function CheckboxGroupField({
+  name,
+  items,
+}: {
+  name: string;
+  items: { value: string; label: string }[];
+}) {
+  return (
+    <Field<CheckboxGroupProps, string, string[]>
+      name={name}
+      as={CheckboxGroup}
+      valueExtract={valueExtract}
+      valueFormat={valueFormat}
+      items={items}
+    />
+  );
+}
+```
+
+`CheckboxGroupFieldDemo.tsx`:
+
+```tsx
+import React from 'react';
+import {
+  useFormState,
+  FormStateContext,
+  FormValueMonitor,
+} from '@sinoui/rx-form-state';
+import CheckboxGroupField from './CheckboxGroupField';
+
+const items = ['足球', '篮球', '排球', '乒乓球'].map((item) => ({
+  value: item,
+  label: item,
+}));
+function CheckboxGroupFieldDemo() {
+  const formState = useFormState({ fav: '足球,篮球' });
+  return (
+    <FormStateContext.Provider value={formState}>
+      <CheckboxGroupField items={items} name="fav" />
+      <FormValueMonitor path="fav">
+        {(fav) => <div>fav值: {fav}</div>}
+      </FormValueMonitor>
+    </FormStateContext.Provider>
+  );
+}
+```
+
+运行效果：
+
+<Playground>
+  <CustomCheckboxGroupDemo />
+</Playground>
