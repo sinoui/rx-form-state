@@ -1,0 +1,90 @@
+{
+  "name": "@sinoui/rx-form-state",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "umd:main": "dist/rx-form-state.umd.production.js",
+  "module": "dist/rx-form-state.esm.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "test": "ts-lib-tools test",
+    "build": "ts-lib-tools build --simple",
+    "format": "ts-lib-tools format",
+    "lint": "ts-lib-tools lint",
+    "release": "yarn build && yarn publish dist",
+    "doc:dev": "docz dev",
+    "doc:build": "docz build",
+    "doc:publish": "docz build && gh-pages -d .docz/dist"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "useTabs": false,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "arrowParens": "always"
+  },
+  "eslintConfig": {
+    "extends": "ts-lib"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "cross-env CI=true ts-lib-tools test",
+      "eslint --fix --color",
+      "git add"
+    ]
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "assets"
+  ],
+  "dependencies": {
+    "@babel/polyfill": "^7.10.4",
+    "@babel/runtime": "^7.11.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^10.4.9",
+    "@testing-library/react-hooks": "^3.4.1",
+    "@types/react": "^16.9.47",
+    "@types/react-dom": "^16.9.8",
+    "@types/theme-ui": "^0.3.6",
+    "docz": "^2.3.1",
+    "gh-pages": "^3.1.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.13",
+    "prettier": "^2.1.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-test-renderer": "^16.13.1",
+    "ts-lib-tools": "^0.13.0",
+    "tsconfig-paths-webpack-plugin": "^3.3.0"
+  }
+}
