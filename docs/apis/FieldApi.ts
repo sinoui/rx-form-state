@@ -1,4 +1,4 @@
-import { FieldValidateProps, FieldModel } from '../src/types';
+import { FieldValidateProps, FieldModel } from '../../src/types';
 
 interface FieldConfig<T = any> extends FieldValidateProps {
   /**
