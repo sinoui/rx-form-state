@@ -139,7 +139,12 @@ function FormDemo() {
 
 <Playground>
   {() => {
-    const initialValues = { userName: '张三', note: '这是初始化数据' };
+    const initialValues = {
+      userName: '张三',
+      note: '这是初始化数据',
+      password: '',
+      age: '',
+    };
     const formState = useFormState(initialValues);
     return (
       <FormStateContext.Provider value={formState}>
@@ -154,8 +159,8 @@ function FormDemo() {
             <label>备注</label>
             <Field as="input" name="note" />
           </form>
+          <button onClick={() => formState.reset()}>重置</button>
         </>
-        <button onClick={() => formState.reset()}>重置</button>
       </FormStateContext.Provider>
     );
   }}
