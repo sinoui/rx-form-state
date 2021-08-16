@@ -191,7 +191,7 @@ function createFormState<T = any>(
     if (!containsTruthProperty(isPending$.value)) {
       return Promise.resolve();
     }
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       const subscription = isPending$
         .pipe(
           map(containsTruthProperty),
