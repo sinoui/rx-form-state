@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs';
 import { useState, useEffect, useRef, useDebugValue } from 'react';
 import { get } from 'lodash';
 import shallowequal from 'shallowequal';
@@ -60,11 +60,17 @@ function useBehaviorSubject<State, Value>(
 
   useEffect(() => {
     let didUnsubscribe = false;
-    const subscription = subject.subscribe((valueState) => {
+
+    const getCurrentValue = () => {
+      const valueState = subject.getValue();
+      const value = getValue(valueState, selector);
+      return value;
+    };
+
+    const checkForUpdates = (value: any) => {
       if (didUnsubscribe) {
         return;
       }
-      const value = getValue(valueState, selector);
 
       setState((prevState) => {
         if (prevState.selector !== selector || prevState.subject !== subject) {
@@ -77,7 +83,13 @@ function useBehaviorSubject<State, Value>(
 
         return { ...prevState, value };
       });
-    });
+    };
+
+    const subscription = subject
+      .pipe(map(getCurrentValue), distinctUntilChanged(isEqualRef.current))
+      .subscribe(checkForUpdates);
+
+    checkForUpdates(getCurrentValue());
 
     return () => {
       didUnsubscribe = true;
