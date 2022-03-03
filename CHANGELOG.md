@@ -1,5 +1,9 @@
 # 版本变更记录
 
+## 1.0.3 2022.03.03
+
+- feat: 添加 registerValidate 额外校验配置
+
 ## 1.0.2 2022.02.18
 
 - fix: 修复 useFieldError 返回 error 信息不准确的缺陷

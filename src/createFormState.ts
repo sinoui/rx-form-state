@@ -83,6 +83,22 @@ function createFormState<T = any>(
   const isPending$ = createSubBehaviorSubject(formState$, 'isPending');
   const relyRules = options.relys || [];
 
+  const validates: Array<() => { [x: string]: string | undefined }> = [];
+
+  /**
+   * 注册额外的表单校验逻辑（注册的额外的表单校验方法只在执行 validate 方法时被调用）
+   *
+   * @param validate 表单校验方法
+   * @returns 返回校验结果
+   */
+  const registerValidate = (validate: () => any) => {
+    validates.push(validate);
+    return () => {
+      const index = validates.findIndex(validate);
+      if (index !== -1) validates.splice(index, 1);
+    };
+  };
+
   /**
    * 更新表单状态
    */
@@ -147,7 +163,12 @@ function createFormState<T = any>(
    * 校验表单
    */
   const validate = () => {
-    const errors = validateForm();
+    const externalErrors = validates.reduce((prev, fn) => {
+      const extError = fn();
+      return { ...prev, extError };
+    }, {});
+
+    const errors = { ...validateForm(), ...externalErrors };
 
     const isValid = !isError(errors);
 
@@ -257,16 +278,14 @@ function createFormState<T = any>(
    * @param fieldName 表单域名称
    */
   const getFieldState$: any = memoize(<M>(fieldName: string) => {
-    const getFieldState = (formState: FormStateModel<T>) => {
-      return {
-        name: fieldName,
-        value: get(formState.values, fieldName) as M,
-        error: get(formState.errors, fieldName) as string | undefined,
-        isTouched: get(formState.isTouched, fieldName) as boolean,
-        asyncError: get(formState.asyncErrors, fieldName) as string | undefined,
-        isPending: get(formState.isPending, fieldName) as boolean,
-      };
-    };
+    const getFieldState = (formState: FormStateModel<T>) => ({
+      name: fieldName,
+      value: get(formState.values, fieldName) as M,
+      error: get(formState.errors, fieldName) as string | undefined,
+      isTouched: get(formState.isTouched, fieldName) as boolean,
+      asyncError: get(formState.asyncErrors, fieldName) as string | undefined,
+      isPending: get(formState.isPending, fieldName) as boolean,
+    });
 
     const fieldState$ = new BehaviorSubject<FieldStateModel<M>>(
       getFieldState(formState$.value),
@@ -282,9 +301,8 @@ function createFormState<T = any>(
    *
    * @param fieldName 表单域名称
    */
-  const getFieldState = <M = any>(fieldName: string): FieldStateModel<M> => {
-    return getFieldState$(fieldName).value as any;
-  };
+  const getFieldState = <M = any>(fieldName: string): FieldStateModel<M> =>
+    getFieldState$(fieldName).value as any;
 
   /**
    * 设置表单域状态
@@ -617,6 +635,7 @@ function createFormState<T = any>(
     removeField,
 
     addRelyRule,
+    registerValidate,
   };
 
   return formState;
