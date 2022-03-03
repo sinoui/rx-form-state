@@ -518,6 +518,8 @@ export interface FormState<T = any> {
    * @param relyFn 值关联计算函数
    */
   addRelyRule(fieldNames: string[], relyFn: (draft: T) => void): () => void;
+
+  registerValidate: Array<() => { [x: string]: string | undefined }>;
 }
 
 /**

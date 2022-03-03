@@ -91,7 +91,9 @@ function createFormState<T = any>(
    * @param validate 表单校验方法
    * @returns 返回校验结果
    */
-  const registerValidate = (validate: () => any) => {
+  const registerValidate = (
+    validate: () => { [x: string]: string | undefined },
+  ) => {
     validates.push(validate);
     return () => {
       const index = validates.findIndex(validate);
