@@ -10,7 +10,7 @@ import useFormStateContext from './useFormStateContext';
 interface FieldBaseProps<
   AsCompProps = any,
   ValueType = any,
-  AsCompValueType = ValueType
+  AsCompValueType = ValueType,
 > extends FieldValidateProps {
   /**
    * 表单域名称。可以指定路径。
@@ -99,7 +99,7 @@ type GenericFieldHTMLAttributes =
 export type RxFieldProps<
   AsCompProps = GenericFieldHTMLAttributes,
   ValueType = any,
-  AsCompValueType = ValueType
+  AsCompValueType = ValueType,
 > = FieldBaseProps<AsCompProps, ValueType, AsCompValueType> &
   Omit<AsCompProps, 'onChange'> & {
     onChange?: (...args: any[]) => void;
@@ -134,7 +134,7 @@ function useSetFieldConfig(props: RxFieldProps<any, any>) {
 function Field<
   AsCompProps = GenericFieldHTMLAttributes,
   ValueType = string,
-  AsCompValueType = ValueType
+  AsCompValueType = ValueType,
 >(props: RxFieldProps<AsCompProps, ValueType, AsCompValueType>) {
   const {
     as: AsComp,
@@ -152,6 +152,7 @@ function Field<
     onBlur,
     innerRef,
     valuePropName = 'value',
+    trimRequired,
     ...rest
   } = props as any;
   const field = useField<any>(name);
